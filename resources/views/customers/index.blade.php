@@ -146,6 +146,13 @@
             //
             //
             $("#add_customer").click(function() {
+                $("#first_name").val("");
+                $("#last_name").val("");
+                $("#store_image").html("");
+                $("#store_image").append("");
+                $("#hidden_id").val("");
+                $(".modal-title").text("Add Customer");
+                $("#action_button").val("Add");
                 $("#action").val("add");
                 $("#FormModal").modal("show");
             });
@@ -198,6 +205,7 @@
                                     .ajax.reload();
                             }
                             $("#form_result").html(html);
+                            // $("#action").val("");
                         }
                     });
                 }
