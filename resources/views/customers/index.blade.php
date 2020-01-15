@@ -32,7 +32,8 @@
                                 </div>
                                 <div class="modal-body">
                                     <span id="form_result"></span>
-                                    <form id="customer_form" action="" method="post" enctype="multipart/form-data">
+                                    <form id="customer_form" enctype="multipart/form-data">
+
                                         @csrf
                                         <div class="form-group">
                                             <label for="" class="float-left">First Name</label>
@@ -97,7 +98,11 @@
 <script>
     $(document).ready(function () {
 
-
+        $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
 
             //get data into server
             //
@@ -108,9 +113,6 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    headers: {
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-                        },
                     url: "{{ route('customers.index') }}",
                     type:"GET",
                 },
@@ -154,6 +156,7 @@
                 $(".modal-title").text("Add Customer");
                 $("#action_button").val("Add");
                 $("#action").val("add");
+                $("#form_result").html("");
                 $("#FormModal").modal("show");
             });
 
@@ -169,11 +172,7 @@
                 //
                 //
                 if ($("#action").val() === "add") {
-
                     $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-                        },
                         type: "POST",
                         url: "{{ route('customers.store') }}",
                         data: new FormData(this),
@@ -217,6 +216,59 @@
 
 
 
+                //insert by edit
+                //
+                //
+                //
+                //  problem in route & data request
+                if ($("#action").val() === "edit") {
+
+
+
+                    $.ajax({
+                        url: "{{ route('customers.store') }}",
+                        type: "POST",
+                        data: new FormData(this),
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        dataType: "json",
+                        success: function(res) {
+                            console.log(res);
+
+                            let html = "";
+                            if (res.errors) {
+                                html = '<div class="alert alert-danger">';
+                                for (
+                                    let count = 0;
+                                    count < res.errors.length;
+                                    count++
+                                ) {
+                                    html += "<p>" + res.errors[count] + "</p>";
+                                }
+                                html += "</div>";
+                            }
+                            if (res.success) {
+                                html =
+                                    '<div class="alert alert-success">' +
+                                    res.success +
+                                    "</div>";
+                                $("#customer_form")[0].reset();
+                                $("#store_image").html("");
+                                $("#customer_table")
+                                    .DataTable()
+                                    .ajax.reload();
+                            }
+                            $("#form_result").html(html);
+                        }
+                    });
+                }
+
+                 //end insert by edit
+                //
+                //
+                //
+                //
 
 
 
@@ -252,9 +304,6 @@
                     $("#form_result").html("");
 
                     $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-                        },
                         url: "/customers/" + id + "/edit",
                         type: "GET",
                         dataType: "json",
@@ -269,7 +318,7 @@
                                     "'  width='70px' class='img-fluid img-thumbnail' alt='person img'>"
                             );
                             $("#store_image").append(
-                                "<input type='hidden' name='hidden_image' value='" +
+                                "<input type='hidden' id='hidden_image' name='hidden_image' value='" +
                                     res.data.customer_image +
                                     "'>"
                             );
