@@ -29,7 +29,6 @@ mix.js('resources/js/app.js', 'public/js')
             'resources/assets/js/libs/jquery.dataTables.min.js',
             'resources/assets/js/libs/dataTables.bootstrap4.min.js',
             'resources/assets/js/libs/sweetalert2@9.js',
-            'resources/assets/js/libs/script.js',
         ],
         'public/js/libs.js'
     );
