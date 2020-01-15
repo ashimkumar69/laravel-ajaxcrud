@@ -1,5 +1,7 @@
 <?php
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,8 +13,13 @@
 |
 */
 
+use Illuminate\Support\Facades\Route;
+
+
 Route::get('/', function () {
     return view('customers.index');
 });
 
-Route::resource('/customers', 'CustomerController');
+Route::resource('/customers', 'CustomerController')->except([
+    'create', 'show', 'update', 'destroy'
+]);

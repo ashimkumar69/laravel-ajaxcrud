@@ -95,6 +95,8 @@ class CustomerController extends Controller
                     return response()->json(["errors" => $error->errors()->all()]);
                 }
 
+                unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($request->hidden_id)->customer_image));
+
                 $image_name  = rand() . "." . $image->getClientOriginalExtension();
                 $image->move(public_path("uploads/customer_photo"), $image_name);
             } else {
@@ -123,7 +125,7 @@ class CustomerController extends Controller
         }
 
 
-
+        unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($request->id)->customer_image));
         $customer = Customer::find($request->id);
         $customer->delete();
 
