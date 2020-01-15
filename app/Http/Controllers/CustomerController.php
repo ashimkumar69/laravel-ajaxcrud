@@ -22,7 +22,7 @@ class CustomerController extends Controller
             return DataTables::of($customers)->addColumn('action', function ($customers) {
                 $button = '<div class="btn-group" role="group" aria-label="Basic example">';
                 $button .= '<button id="' . $customers->id . '" type="button" class="btn btn-sm btn-primary editBtn">Edit</button>';
-                $button .= '<button id="' . $customers->id . '" type="button" class="btn btn-sm btn-danger">Delete</button>';
+                $button .= '<button id="' . $customers->id . '" type="button" class="btn btn-sm btn-danger deleteBtn">Delete</button>';
                 $button .= '</div>';
                 return $button;
             })->make(true);
@@ -78,49 +78,54 @@ class CustomerController extends Controller
         }
 
 
-            if($request->action == "edit"){
-                $image_name = $request->hidden_image;
-                $image = $request->file("customer_image");
+        if ($request->action == "edit") {
+            $image_name = $request->hidden_image;
+            $image = $request->file("customer_image");
 
-                if ($image != "") {
-                    $rule = [
-                        "first_name" => "required",
-                        "last_name" => "required",
-                        "customer_image" => "required|image|max:2048",
-                    ];
-
-                    $error = Validator::make($request->all(), $rule);
-
-                    if ($error->fails()) {
-                        return response()->json(["errors" => $error->errors()->all()]);
-                    }
-
-                    $image_name  = rand() . "." . $image->getClientOriginalExtension();
-                    $image->move(public_path("uploads/customer_photo"), $image_name);
-                } else {
-
-                    $rule = [
-                        "first_name" => "required",
-                        "last_name" => "required",
-                    ];
-
-                    $error = Validator::make($request->all(), $rule);
-
-                    if ($error->fails()) {
-                        return response()->json(["errors" => $error->errors()->all()]);
-                    }
-                }
-
-                $form_data = [
-                    "first_name" => $request->first_name,
-                    "last_name" => $request->last_name,
-                    "customer_image" => $image_name,
+            if ($image != "") {
+                $rule = [
+                    "first_name" => "required",
+                    "last_name" => "required",
+                    "customer_image" => "required|image|max:2048",
                 ];
 
-                Customer::whereId($request->hidden_id)->update($form_data);
+                $error = Validator::make($request->all(), $rule);
 
-                return response()->json(["success" => "Data Added successfully"]);
+                if ($error->fails()) {
+                    return response()->json(["errors" => $error->errors()->all()]);
+                }
+
+                $image_name  = rand() . "." . $image->getClientOriginalExtension();
+                $image->move(public_path("uploads/customer_photo"), $image_name);
+            } else {
+
+                $rule = [
+                    "first_name" => "required",
+                    "last_name" => "required",
+                ];
+
+                $error = Validator::make($request->all(), $rule);
+
+                if ($error->fails()) {
+                    return response()->json(["errors" => $error->errors()->all()]);
+                }
             }
+
+            $form_data = [
+                "first_name" => $request->first_name,
+                "last_name" => $request->last_name,
+                "customer_image" => $image_name,
+            ];
+
+            Customer::whereId($request->hidden_id)->update($form_data);
+
+            return response()->json(["success" => "Data Added successfully"]);
+        }
+
+
+
+        $customer = Customer::find($request->id);
+        $customer->delete();
 
 
 
@@ -161,9 +166,6 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-
-
     }
 
     /**
@@ -174,6 +176,6 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+
     }
 }

@@ -21,6 +21,7 @@
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="{{ asset("js/libs.js")}}"></script>
+    <script src="{{ asset("js/sweetalert2@9.js")}}"></script>
     @yield('fontend_js')
 
 

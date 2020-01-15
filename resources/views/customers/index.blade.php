@@ -150,6 +150,7 @@
             $("#add_customer").click(function() {
                 $("#first_name").val("");
                 $("#last_name").val("");
+                $("#customer_image").val("");
                 $("#store_image").html("");
                 $("#store_image").append("");
                 $("#hidden_id").val("");
@@ -234,7 +235,7 @@
                         processData: false,
                         dataType: "json",
                         success: function(res) {
-                            console.log(res);
+
 
                             let html = "";
                             if (res.errors) {
@@ -339,6 +340,74 @@
 
 
 
+
+
+
+                 // delete customer
+                //
+                //
+                //
+                //
+                $(document).on("click", ".deleteBtn", function() {
+                    let id = $(this).attr("id");
+
+
+
+                    const swalWithBootstrapButtons = Swal.mixin({
+                            customClass: {
+                                confirmButton: 'btn btn-success',
+                                cancelButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: false
+                            })
+
+                            swalWithBootstrapButtons.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, delete it!',
+                            cancelButtonText: 'No, cancel!',
+                            reverseButtons: true
+                            }).then((result) => {
+                            if (result.value) {
+
+                                $.ajax({
+                                    url: "{{ route('customers.store') }}",
+                                    type: "POST",
+                                    data:{id:id},
+                                    dataType: "json",
+                                    success: function(res) {
+
+                                    }
+                                });
+                                $("#customer_table")
+                                    .DataTable()
+                                    .ajax.reload();
+
+                                swalWithBootstrapButtons.fire(
+                                        'Deleted!',
+                                        'Your file has been deleted.',
+                                        'success'
+                                        )
+
+                            } else if (
+                                /* Read more about handling dismissals below */
+                                result.dismiss === Swal.DismissReason.cancel
+                            ) {
+                                swalWithBootstrapButtons.fire(
+                                'Cancelled',
+                                'Your imaginary file is safe :)',
+                                'error'
+                                )
+                            }
+                         })
+                });
+                 //end delete customer
+                //
+                //
+                //
+                //
 
 // end on load
 });
