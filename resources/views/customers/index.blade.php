@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <span id="form_result"></span>
-                                    <form id="customer_form" enctype="multipart/form-data">
+                                    <form id="customer_form" method="POST" enctype="multipart/form-data">
 
                                         @csrf
                                         <div class="form-group">
@@ -114,7 +114,7 @@
         serverSide: true,
         ajax: {
             url: "{{ route('customers.index') }}",
-            type: "GET"
+            method: "GET"
         },
         columns: [
             { data: "id", name: "id" },
@@ -151,10 +151,10 @@
         $("#store_image").html("");
         $("#store_image").append("");
         $("#hidden_id").val("");
+        $("#form_result").html("");
         $(".modal-title").text("Add Customer");
         $("#action_button").val("Add");
         $("#action").val("add");
-        $("#form_result").html("");
         $("#FormModal").modal("show");
     });
 
@@ -165,10 +165,10 @@
         //
         //
         //
-        if ($("#action").val() === "add") {
+        if ($("#action").val() == "add") {
             $.ajax({
-                type: "POST",
                 url: "{{ route('customers.store') }}",
+                method: "POST",
                 data: new FormData(this),
                 contentType: false,
                 cache: false,
@@ -198,7 +198,7 @@
                             .ajax.reload();
                     }
                     $("#form_result").html(html);
-                    // $("#action").val("");
+
                 }
             });
         }
@@ -212,8 +212,8 @@
         //
         //
         //
-        //  problem in route & data request
-        if ($("#action").val() === "edit") {
+        //
+        if ($("#action").val() == "edit") {
             $.ajax({
                 url: "{{ route('customers.store') }}",
                 type: "POST",
@@ -272,8 +272,9 @@
     //
 
     $(document).on("click", ".editBtn", function() {
-        let id = $(this).attr("id");
+
         $("#form_result").html("");
+        let id = $(this).attr("id");
 
         $.ajax({
             url: "/customers/" + id + "/edit",
@@ -313,6 +314,7 @@
     //
     //
     $(document).on("click", ".deleteBtn", function() {
+
         let id = $(this).attr("id");
 
         const swalWithBootstrapButtons = Swal.mixin({
@@ -338,11 +340,13 @@
                     $.ajax({
                         url: "{{ route('customers.store') }}",
                         type: "POST",
-                        data: { id: id },
-                        dataType: "json",
-                        success: function(res) {}
-                    });
-                    $("#customer_table")
+                        data: {
+                        id:id,
+                        delete: 2,
+                        },
+                        success: function(res) {
+                            if(res.success){
+                            $("#customer_table")
                         .DataTable()
                         .ajax.reload();
 
@@ -351,6 +355,18 @@
                         "Your file has been deleted.",
                         "success"
                     );
+                        }
+                        if(res.error){
+
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        })
+                        }
+                        }
+                    });
+
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel

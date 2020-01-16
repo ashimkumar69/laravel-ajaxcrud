@@ -20,6 +20,6 @@ Route::get('/', function () {
     return view('customers.index');
 });
 
-Route::resource('/customers', 'CustomerController')->except([
-    'create', 'show', 'update', 'destroy'
+Route::resource('/customers', 'CustomerController')->only([
+    'index', 'store', 'edit'
 ]);

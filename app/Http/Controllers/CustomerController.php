@@ -125,9 +125,15 @@ class CustomerController extends Controller
         }
 
 
-        unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($request->id)->customer_image));
-        $customer = Customer::find($request->id);
-        $customer->delete();
+        // delete request
+        if ($request->delete == 1) {
+            unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($request->id)->customer_image));
+            $customer = Customer::findOrFail($request->id);
+            $customer->delete();
+            return response()->json(["success" => "Data Added successfully"]);
+        } else {
+            return response()->json(["error" => "Bad request"]);
+        }
 
 
 
@@ -176,8 +182,8 @@ class CustomerController extends Controller
      * @param  \App\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer)
+    public function destroy(Customer $customer, $id)
     {
-
+        //
     }
 }
