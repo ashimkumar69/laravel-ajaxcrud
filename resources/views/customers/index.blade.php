@@ -265,11 +265,23 @@
     //
     //
 
+
+
+
+
+
+
+
+
+
+
     //get data to server for edit
     //
     //
     //
     //
+
+
 
     $(document).on("click", ".editBtn", function() {
 
@@ -279,6 +291,9 @@
         $.ajax({
             url: "/customers/" + id + "/edit",
             type: "GET",
+            data:{
+                "id":id
+            },
             dataType: "json",
             success: function(res) {
                 $("#first_name").val(res.data.first_name);
@@ -342,7 +357,7 @@
                         type: "POST",
                         data: {
                         id:id,
-                        delete: 2,
+                        delete: 1,
                         },
                         success: function(res) {
                             if(res.success){

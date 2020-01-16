@@ -21,8 +21,8 @@ class CustomerController extends Controller
             $customers = Customer::latest()->get();
             return DataTables::of($customers)->addColumn('action', function ($customers) {
                 $button = '<div class="btn-group" role="group" aria-label="Basic example">';
-                $button .= '<button id="' . $customers->id . '" type="button" class="btn btn-sm btn-primary editBtn">Edit</button>';
-                $button .= '<button id="' . $customers->id . '" type="button" class="btn btn-sm btn-danger deleteBtn">Delete</button>';
+                $button .= '<button id="' . $customers->id . '" type="button" class="editBtn btn btn-sm btn-primary">Edit</button>';
+                $button .= '<button id="' . $customers->id . '" type="button" class="deleteBtn btn btn-sm btn-danger">Delete</button>';
                 $button .= '</div>';
                 return $button;
             })->make(true);
@@ -134,9 +134,6 @@ class CustomerController extends Controller
         } else {
             return response()->json(["error" => "Bad request"]);
         }
-
-
-
     }
 
     /**
@@ -145,7 +142,7 @@ class CustomerController extends Controller
      * @param  \App\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function show(Customer $customer)
+    public function show(Request $request, $id)
     {
         //
     }
@@ -160,7 +157,7 @@ class CustomerController extends Controller
     {
         if ($request->ajax()) {
 
-            $data = Customer::findOrFail($id);
+            $data = Customer::findOrFail($request->id);
             return response()->json(["data" => $data]);
         }
     }
