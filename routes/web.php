@@ -20,6 +20,4 @@ Route::get('/', function () {
     return view('customers.index');
 });
 
-Route::resource('/customers', 'CustomerController')->only([
-    'index', 'store', 'edit'
-]);
+Route::resource('/customers', 'CustomerController');

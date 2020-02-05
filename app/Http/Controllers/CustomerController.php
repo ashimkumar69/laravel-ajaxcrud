@@ -123,17 +123,6 @@ class CustomerController extends Controller
 
             return response()->json(["success" => "Data Added successfully"]);
         }
-
-
-        // delete request
-        if ($request->delete == 1) {
-            unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($request->id)->customer_image));
-            $customer = Customer::findOrFail($request->id);
-            $customer->delete();
-            return response()->json(["success" => "Data Added successfully"]);
-        } else {
-            return response()->json(["error" => "Bad request"]);
-        }
     }
 
     /**
@@ -144,7 +133,8 @@ class CustomerController extends Controller
      */
     public function show(Request $request, $id)
     {
-        //
+        $data = Customer::findOrFail($id);
+        return response()->json(["data" => $data]);
     }
 
     /**
@@ -155,11 +145,8 @@ class CustomerController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        if ($request->ajax()) {
 
-            $data = Customer::findOrFail($request->id);
-            return response()->json(["data" => $data]);
-        }
+        //    
     }
 
     /**
@@ -171,6 +158,8 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        //  
     }
 
     /**
@@ -179,8 +168,12 @@ class CustomerController extends Controller
      * @param  \App\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer, $id)
+    public function destroy($id)
     {
-        //
+
+        $customer = Customer::findOrFail($id);
+        unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($id)->customer_image));
+        $customer->delete();
+        return response()->json(["success" => "Data Delete successfully!!!"]);
     }
 }
