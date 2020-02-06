@@ -21,8 +21,8 @@ class CustomerController extends Controller
             $customers = Customer::latest()->get();
             return DataTables::of($customers)->addColumn('action', function ($customers) {
                 $button = '<div class="btn-group" role="group" aria-label="Basic example">';
-                $button .= '<button id="' . $customers->id . '" type="button" class="btn btn-sm btn-primary editBtn">Edit</button>';
-                $button .= '<button id="' . $customers->id . '" type="button" class="btn btn-sm btn-danger">Delete</button>';
+                $button .= '<button id="' . $customers->id . '" type="button" class="editBtn btn btn-sm btn-primary">Edit</button>';
+                $button .= '<button id="' . $customers->id . '" type="button" class="deleteBtn btn btn-sm btn-danger">Delete</button>';
                 $button .= '</div>';
                 return $button;
             })->make(true);
@@ -48,75 +48,7 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        $rule = [
-            "first_name" => "required",
-            "last_name" => "required",
-            "customer_image" => "required|image|max:2048",
-        ];
-
-        $error = Validator::make($request->all(), $rule);
-
-        if ($error->fails()) {
-            return response()->json(["errors" => $error->errors()->all()]);
-        }
-
-        $image = $request->file("customer_image");
-        $new_name = rand() . "." . $image->getClientOriginalExtension();
-        $image->move(public_path("uploads/customer_photo"), $new_name);
-
-
-        $form_data = [
-            "first_name" => $request->first_name,
-            "last_name" => $request->last_name,
-            "customer_image" => $new_name,
-        ];
-
-        Customer::create($form_data);
-
-        return response()->json(["success" => "Data Added successfully"]);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Customer  $customer
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Customer $customer)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Customer  $customer
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Request $request, $id)
-    {
-        if ($request->ajax()) {
-
-            $data = Customer::findOrFail($id);
-            return response()->json(["data" => $data]);
-        }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Customer  $customer
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request)
-    {
-
-
-        $image_name = $request->hidden_image;
-        $image = $request->file("customer_image");
-
-        if ($image != "") {
+        if ($request->action == "add") {
             $rule = [
                 "first_name" => "required",
                 "last_name" => "required",
@@ -129,31 +61,102 @@ class CustomerController extends Controller
                 return response()->json(["errors" => $error->errors()->all()]);
             }
 
-            $image_name  = rand() . "." . $image->getClientOriginalExtension();
-            $image->move(public_path("uploads/customer_photo"), $image_name);
-        } else {
+            $image = $request->file("customer_image");
+            $new_name = rand() . "." . $image->getClientOriginalExtension();
+            $image->move(public_path("uploads/customer_photo"), $new_name);
 
-            $rule = [
-                "first_name" => "required",
-                "last_name" => "required",
+
+            $form_data = [
+                "first_name" => $request->first_name,
+                "last_name" => $request->last_name,
+                "customer_image" => $new_name,
             ];
 
-            $error = Validator::make($request->all(), $rule);
+            Customer::create($form_data);
 
-            if ($error->fails()) {
-                return response()->json(["errors" => $error->errors()->all()]);
-            }
+            return response()->json(["success" => "Data Added successfully"]);
         }
+    }
 
-        $form_data = [
-            "first_name" => $request->first_name,
-            "last_name" => $request->last_name,
-            "customer_image" => $image_name,
-        ];
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Customer  $customer
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Request $request, $id)
+    {
+        $data = Customer::findOrFail($id);
+        return response()->json(["data" => $data]);
+    }
 
-        Customer::whereId($request->hidden_id)->update($form_data);
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Customer  $customer
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Request $request, $id)
+    {
 
-        return response()->json(["success" => "Data Added successfully"]);
+        //    
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Customer  $customer
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+
+        if ($request->action == "edit") {
+            $image_name = $request->hidden_image;
+            $image = $request->file("customer_image");
+
+            if ($image != "") {
+                $rule = [
+                    "first_name" => "required",
+                    "last_name" => "required",
+                    "customer_image" => "required|image|max:2048",
+                ];
+
+                $error = Validator::make($request->all(), $rule);
+
+                if ($error->fails()) {
+                    return response()->json(["errors" => $error->errors()->all()]);
+                }
+
+                unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($id)->customer_image));
+
+                $image_name  = rand() . "." . $image->getClientOriginalExtension();
+                $image->move(public_path("uploads/customer_photo"), $image_name);
+            } else {
+
+                $rule = [
+                    "first_name" => "required",
+                    "last_name" => "required",
+                ];
+
+                $error = Validator::make($request->all(), $rule);
+
+                if ($error->fails()) {
+                    return response()->json(["errors" => $error->errors()->all()]);
+                }
+            }
+
+            $form_data = [
+                "first_name" => $request->first_name,
+                "last_name" => $request->last_name,
+                "customer_image" => $image_name,
+            ];
+
+            Customer::whereId($id)->update($form_data);
+
+            return response()->json(["success" => "Data Updated successfully"]);
+        }
     }
 
     /**
@@ -162,8 +165,12 @@ class CustomerController extends Controller
      * @param  \App\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer)
+    public function destroy($id)
     {
-        //
+
+        $customer = Customer::findOrFail($id);
+        unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($id)->customer_image));
+        $customer->delete();
+        return response()->json(["success" => "Data Delete successfully!!!"]);
     }
 }
