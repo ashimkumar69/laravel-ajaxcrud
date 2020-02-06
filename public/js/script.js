@@ -121,9 +121,11 @@ $(document).ready(function() {
         //
         //
         if ($("#action").val() == "edit") {
+            let id = $("#hidden_id").val();
+
             $.ajax({
                 method: "post",
-                url: "/customers",
+                url: "/customers/" + id,
                 data: new FormData(this),
                 contentType: false,
                 cache: false,
@@ -131,7 +133,6 @@ $(document).ready(function() {
                 dataType: "json"
             })
                 .done(function(res) {
-                    
                     let html = "";
                     if (res.success) {
                         html =
@@ -184,7 +185,7 @@ $(document).ready(function() {
     //
 
     $(document).on("click", ".editBtn", function() {
-        $("#hidden_method").val("post");
+        $("#hidden_method").val("put");
         $("#form_result").html("");
         let id = $(this).attr("id");
 

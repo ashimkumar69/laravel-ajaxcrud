@@ -76,53 +76,6 @@ class CustomerController extends Controller
 
             return response()->json(["success" => "Data Added successfully"]);
         }
-
-
-        if ($request->action == "edit") {
-            $image_name = $request->hidden_image;
-            $image = $request->file("customer_image");
-
-            if ($image != "") {
-                $rule = [
-                    "first_name" => "required",
-                    "last_name" => "required",
-                    "customer_image" => "required|image|max:2048",
-                ];
-
-                $error = Validator::make($request->all(), $rule);
-
-                if ($error->fails()) {
-                    return response()->json(["errors" => $error->errors()->all()]);
-                }
-
-                unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($request->hidden_id)->customer_image));
-
-                $image_name  = rand() . "." . $image->getClientOriginalExtension();
-                $image->move(public_path("uploads/customer_photo"), $image_name);
-            } else {
-
-                $rule = [
-                    "first_name" => "required",
-                    "last_name" => "required",
-                ];
-
-                $error = Validator::make($request->all(), $rule);
-
-                if ($error->fails()) {
-                    return response()->json(["errors" => $error->errors()->all()]);
-                }
-            }
-
-            $form_data = [
-                "first_name" => $request->first_name,
-                "last_name" => $request->last_name,
-                "customer_image" => $image_name,
-            ];
-
-            Customer::whereId($request->hidden_id)->update($form_data);
-
-            return response()->json(["success" => "Data Added successfully"]);
-        }
     }
 
     /**
@@ -159,7 +112,51 @@ class CustomerController extends Controller
     public function update(Request $request, $id)
     {
 
-        //  
+        if ($request->action == "edit") {
+            $image_name = $request->hidden_image;
+            $image = $request->file("customer_image");
+
+            if ($image != "") {
+                $rule = [
+                    "first_name" => "required",
+                    "last_name" => "required",
+                    "customer_image" => "required|image|max:2048",
+                ];
+
+                $error = Validator::make($request->all(), $rule);
+
+                if ($error->fails()) {
+                    return response()->json(["errors" => $error->errors()->all()]);
+                }
+
+                unlink(base_path("public/uploads/customer_photo/" . Customer::findOrFail($id)->customer_image));
+
+                $image_name  = rand() . "." . $image->getClientOriginalExtension();
+                $image->move(public_path("uploads/customer_photo"), $image_name);
+            } else {
+
+                $rule = [
+                    "first_name" => "required",
+                    "last_name" => "required",
+                ];
+
+                $error = Validator::make($request->all(), $rule);
+
+                if ($error->fails()) {
+                    return response()->json(["errors" => $error->errors()->all()]);
+                }
+            }
+
+            $form_data = [
+                "first_name" => $request->first_name,
+                "last_name" => $request->last_name,
+                "customer_image" => $image_name,
+            ];
+
+            Customer::whereId($id)->update($form_data);
+
+            return response()->json(["success" => "Data Updated successfully"]);
+        }
     }
 
     /**
